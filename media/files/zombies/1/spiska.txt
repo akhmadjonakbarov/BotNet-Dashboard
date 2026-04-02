@@ -1,0 +1,7 @@
+1. get members by query filter if all_no_admin is true, get all members except admin otherwise just all user.
+
+2. filter admin's salary by date and all
+
+3. fix error related unit km2
+
+4. 

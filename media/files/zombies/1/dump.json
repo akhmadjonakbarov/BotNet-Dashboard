@@ -1,0 +1,24 @@
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2OTg0NTY4MCwiaWF0IjoxNzY5MjQwODgwLCJqdGkiOiIxNjM4Yzc4Nzk5M2E0ZjA0OGRlMTU3ZTFkNmNkNTkwMSIsInVzZXJfaWQiOiIxMTRlZThlMy0xZmZhLTRhMDktYmM2Mi04YWI3YzNjNDgwYWEifQ.E22N9fkRYLVKg3r-zopCvsLBFT2P2dccbCiAkFzebX4",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY5MzI3MjgwLCJpYXQiOjE3NjkyNDA4ODAsImp0aSI6IjJiNDM3OGI2ZWMxNDRiMzlhOGE0M2JlNzAxNDEyZTQyIiwidXNlcl9pZCI6IjExNGVlOGUzLTFmZmEtNGEwOS1iYzYyLThhYjdjM2M0ODBhYSJ9.3cuaqk4NySZq9EUjVonmLUEHx07YD7CSrNIPWgwYusc",
+  "user": {
+    "id": "114ee8e3-1ffa-4a09-bc62-8ab7c3c480aa",
+    "first_name": "Akhmad",
+    "last_name": "Akbarov",
+    "phone": "+998999921684",
+    "avatar": "https://spiskauz.pythonanywhere.com/media/profile-images/image_cropper_1768595766422.jpg"
+  }
+}
+
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2OTk1MTA3OSwiaWF0IjoxNzY5MzQ2Mjc5LCJqdGkiOiJhZmY3OGE4ODI3Yzk0N2Q0YWI5ODY4OWUxM2Q0NmMxMiIsInVzZXJfaWQiOiI4NWQ2NGQ5ZC0yNzU1LTQxZmMtOTQ2MC03NjZiMTE2NmNkMjYifQ.n7x2Z38cSa1g7HTzoDvFr_v3mmJvvrsTqddAR6kSqI4",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY5NDMyNjc5LCJpYXQiOjE3NjkzNDYyNzksImp0aSI6IjNlZGFjNmIxMDM5NzQ3MDJiOWY4ZmRlNDM4MjM1YzEyIiwidXNlcl9pZCI6Ijg1ZDY0ZDlkLTI3NTUtNDFmYy05NDYwLTc2NmIxMTY2Y2QyNiJ9.GLUr1Ev5APeyRzdOCyaIQXegjl1jqxnyD6dd_wjzsnM",
+  "user": {
+    "id": "85d64d9d-2755-41fc-9460-766b1166cd26",
+    "first_name": "Yusuf",
+    "last_name": "2inchi",
+    "phone": "+998946511334",
+    "avatar": "https://spiskauz.pythonanywhere.com/media/profile-images/image_cropper_1766546083997.jpg"
+  }
+}

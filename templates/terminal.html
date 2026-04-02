@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zombie Shell | {{ zombie_id }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"/>
+    <style>
+        body {
+            background: #0a0a0a;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        #terminal {
+            height: 90vh;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            background: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+
+<div id="terminal"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+
+<script>
+    // 1. Initialize Terminal UI
+    const term = new Terminal({
+        cursorBlink: true,
+        theme: {
+            background: '#1e1e1e',
+            foreground: '#00ff00',
+            cursor: '#00ff00'
+        },
+        fontFamily: 'monospace',
+        fontSize: 14
+    });
+
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(document.getElementById('terminal'));
+    fitAddon.fit();
+
+    term.writeln('\x1b[1;32m[+] Initializing Session for ZOMBIE_{{ zombie_id }}...\x1b[0m');
+
+    // 2. Setup WebSocket
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(`${protocol}://${window.location.host}/api/v1/zombies/terminal/ws/{{ zombie_id }}`);
+
+    let currentLine = '';
+    let lastCwd = '...'; // Stores the path returned by the agent
+
+    socket.onopen = () => {
+        term.writeln('\x1b[1;32m[+] WebSocket Connected Successfully.\x1b[0m');
+        // Initial generic prompt until the first command returns the real CWD
+        term.write('\r\n$ ');
+    };
+
+    // 3. Key Handling Logic
+    term.onKey(e => {
+        const ev = e.domEvent;
+        const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;
+
+        if (socket.readyState !== WebSocket.OPEN) return;
+
+        if (ev.keyCode === 13) { // Enter Key
+            const cmd = currentLine.trim().toLowerCase();
+
+            // Handle 'clear' or 'cls' locally to wipe the screen
+            if (cmd === 'clear' || cmd === 'cls') {
+                term.reset();
+                term.write(`\r\n\x1b[1;34m[${lastCwd}]\x1b[0m \x1b[1;32m$\x1b[0m `);
+                currentLine = '';
+                return;
+            }
+
+            // Send command to backend
+            if (currentLine.trim()) {
+                socket.send(JSON.stringify({ action: "exec", cmd: currentLine }));
+            }
+
+            term.write('\r\n');
+            currentLine = '';
+
+        } else if (ev.keyCode === 8) { // Backspace
+            if (currentLine.length > 0) {
+                currentLine = currentLine.slice(0, -1);
+                term.write('\b \b');
+            }
+        } else if (printable) {
+            currentLine += e.key;
+            term.write(e.key);
+        }
+    });
+
+    // 4. Handle Incoming Data (Output + Directory)
+    socket.onmessage = (ev) => {
+        try {
+            const data = JSON.parse(ev.data);
+
+            // 1. Show command output if it exists
+            if (data.output) {
+                term.writeln(data.output.replace(/\n/g, '\r\n'));
+            }
+
+            // 2. Update the prompt with current directory (CWD)
+            if (data.cwd) {
+                lastCwd = data.cwd;
+            }
+
+            // Format: [C:\Path\To\Dir] $ (Blue path, Green dollar)
+            term.write(`\r\n\x1b[1;34m[${lastCwd}]\x1b[0m \x1b[1;32m$\x1b[0m `);
+
+        } catch (err) {
+            console.error("Data error:", err);
+        }
+    };
+
+    // 5. Connection Error States
+    socket.onerror = (err) => {
+        term.writeln('\r\n\x1b[31m[!] CONNECTION ERROR\x1b[0m');
+    };
+
+    socket.onclose = (e) => {
+        term.writeln('\r\n\x1b[31m[!] CONNECTION CLOSED (Code: ' + e.code + ')\x1b[0m');
+    };
+
+    // 6. Keep terminal size in sync with browser window
+    window.onresize = () => fitAddon.fit();
+
+</script>
+</body>
+</html>
