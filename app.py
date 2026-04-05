@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from apps.user.admin import UserAdmin
 from apps.zombie.admin import ZombieAdmin, CommandAdmin, LogAdmin, FileAdmin, NotificationAdmin
+from apps.ddos.admin import DDosAdmin
 from config.dashboard_security import authentication_backend
 from config.database import create_all_tables, engine
 from apps.routes import main_router
@@ -42,6 +43,7 @@ admin.add_view(CommandAdmin)
 admin.add_view(LogAdmin)
 admin.add_view(FileAdmin)
 admin.add_view(NotificationAdmin)
+admin.add_view(DDosAdmin)
 
 # admin
 app.include_router(main_router)

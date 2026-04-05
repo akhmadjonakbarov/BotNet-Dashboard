@@ -160,7 +160,7 @@ async def terminal_websocket_bridge(websocket: WebSocket, zombie_id: str):
                     status="issued"  # Mark it as sent
                 )
                 session.add(new_cmd)
-                await session.flush()  # This generates the ID
+                await session.flush()
                 cmd_id = new_cmd.id
                 await session.commit()
 
